@@ -1,4 +1,3 @@
-
 ---
 title: Visit With Us Wellness Tourism Predictor
 emoji: 🌿
