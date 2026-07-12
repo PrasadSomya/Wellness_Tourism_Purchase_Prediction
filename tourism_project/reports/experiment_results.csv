@@ -1,0 +1,5 @@
+model_name,best_cv_f1_score,best_cv_precision,best_cv_recall,best_cv_roc_auc,best_params
+Random Forest,0.6556767042734782,0.7183855993982576,0.6040914278567296,0.9120397838633135,"{'classifier__max_depth': None, 'classifier__min_samples_leaf': 3}"
+Decision Tree,0.6227739253429834,0.6180745643516798,0.6283789065553523,0.7672601369393215,"{'classifier__max_depth': None, 'classifier__min_samples_leaf': 1}"
+Gradient Boosting,0.5651665829010474,0.7903814244383934,0.440942419836468,0.8739868966468141,"{'classifier__learning_rate': 0.1, 'classifier__max_depth': 3, 'classifier__n_estimators': 120}"
+AdaBoost,0.1447189054680482,0.8841666666666667,0.0791864046401826,0.7919231586467763,"{'classifier__learning_rate': 0.1, 'classifier__n_estimators': 100}"

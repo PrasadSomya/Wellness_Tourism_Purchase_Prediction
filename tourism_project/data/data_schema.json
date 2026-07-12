@@ -1,0 +1,67 @@
+{
+  "target": "ProdTaken",
+  "raw_rows": 4128,
+  "raw_columns": 21,
+  "clean_rows": 4011,
+  "clean_columns": 19,
+  "train_rows": 3208,
+  "test_rows": 803,
+  "dropped_columns": [
+    "Unnamed: 0",
+    "CustomerID"
+  ],
+  "feature_columns": [
+    "Age",
+    "TypeofContact",
+    "CityTier",
+    "DurationOfPitch",
+    "Occupation",
+    "Gender",
+    "NumberOfPersonVisiting",
+    "NumberOfFollowups",
+    "ProductPitched",
+    "PreferredPropertyStar",
+    "MaritalStatus",
+    "NumberOfTrips",
+    "Passport",
+    "PitchSatisfactionScore",
+    "OwnCar",
+    "NumberOfChildrenVisiting",
+    "Designation",
+    "MonthlyIncome"
+  ],
+  "numeric_columns": [
+    "Age",
+    "CityTier",
+    "DurationOfPitch",
+    "NumberOfPersonVisiting",
+    "NumberOfFollowups",
+    "PreferredPropertyStar",
+    "NumberOfTrips",
+    "Passport",
+    "PitchSatisfactionScore",
+    "OwnCar",
+    "NumberOfChildrenVisiting",
+    "MonthlyIncome"
+  ],
+  "categorical_columns": [
+    "TypeofContact",
+    "Occupation",
+    "Gender",
+    "ProductPitched",
+    "MaritalStatus",
+    "Designation"
+  ],
+  "target_distribution_overall": {
+    "0": 0.807,
+    "1": 0.193
+  },
+  "target_distribution_train": {
+    "0": 0.807,
+    "1": 0.193
+  },
+  "target_distribution_test": {
+    "0": 0.807,
+    "1": 0.193
+  }
+}

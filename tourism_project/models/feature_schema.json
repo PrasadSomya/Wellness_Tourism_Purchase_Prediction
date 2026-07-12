@@ -1,0 +1,103 @@
+{
+  "target": "ProdTaken",
+  "feature_order": [
+    "Age",
+    "TypeofContact",
+    "CityTier",
+    "DurationOfPitch",
+    "Occupation",
+    "Gender",
+    "NumberOfPersonVisiting",
+    "NumberOfFollowups",
+    "ProductPitched",
+    "PreferredPropertyStar",
+    "MaritalStatus",
+    "NumberOfTrips",
+    "Passport",
+    "PitchSatisfactionScore",
+    "OwnCar",
+    "NumberOfChildrenVisiting",
+    "Designation",
+    "MonthlyIncome"
+  ],
+  "numeric_features": [
+    "Age",
+    "CityTier",
+    "DurationOfPitch",
+    "NumberOfPersonVisiting",
+    "NumberOfFollowups",
+    "PreferredPropertyStar",
+    "NumberOfTrips",
+    "Passport",
+    "PitchSatisfactionScore",
+    "OwnCar",
+    "NumberOfChildrenVisiting",
+    "MonthlyIncome"
+  ],
+  "categorical_features": [
+    "TypeofContact",
+    "Occupation",
+    "Gender",
+    "ProductPitched",
+    "MaritalStatus",
+    "Designation"
+  ],
+  "numeric_defaults": {
+    "Age": 36.0,
+    "CityTier": 1.0,
+    "DurationOfPitch": 14.0,
+    "NumberOfPersonVisiting": 3.0,
+    "NumberOfFollowups": 4.0,
+    "PreferredPropertyStar": 3.0,
+    "NumberOfTrips": 3.0,
+    "Passport": 0.0,
+    "PitchSatisfactionScore": 3.0,
+    "OwnCar": 1.0,
+    "NumberOfChildrenVisiting": 1.0,
+    "MonthlyIncome": 22403.0
+  },
+  "categorical_defaults": {
+    "TypeofContact": "Self Enquiry",
+    "Occupation": "Salaried",
+    "Gender": "Male",
+    "ProductPitched": "Basic",
+    "MaritalStatus": "Married",
+    "Designation": "Executive"
+  },
+  "categorical_values": {
+    "TypeofContact": [
+      "Company Invited",
+      "Self Enquiry"
+    ],
+    "Occupation": [
+      "Free Lancer",
+      "Large Business",
+      "Salaried",
+      "Small Business"
+    ],
+    "Gender": [
+      "Female",
+      "Male"
+    ],
+    "ProductPitched": [
+      "Basic",
+      "Deluxe",
+      "King",
+      "Standard",
+      "Super Deluxe"
+    ],
+    "MaritalStatus": [
+      "Divorced",
+      "Married",
+      "Single",
+      "Unmarried"
+    ],
+    "Designation": [
+      "AVP",
+      "Executive",
+      "Manager",
+      "Senior Manager",
+      "VP"
+    ]
+  }
+}

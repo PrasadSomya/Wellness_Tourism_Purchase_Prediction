@@ -1,0 +1,47 @@
+[
+  {
+    "model_name": "Decision Tree",
+    "best_cv_f1_score": 0.6227739253429834,
+    "best_cv_precision": 0.6180745643516798,
+    "best_cv_recall": 0.6283789065553523,
+    "best_cv_roc_auc": 0.7672601369393215,
+    "best_params": {
+      "classifier__max_depth": null,
+      "classifier__min_samples_leaf": 1
+    }
+  },
+  {
+    "model_name": "Random Forest",
+    "best_cv_f1_score": 0.6556767042734782,
+    "best_cv_precision": 0.7183855993982576,
+    "best_cv_recall": 0.6040914278567296,
+    "best_cv_roc_auc": 0.9120397838633135,
+    "best_params": {
+      "classifier__max_depth": null,
+      "classifier__min_samples_leaf": 3
+    }
+  },
+  {
+    "model_name": "Gradient Boosting",
+    "best_cv_f1_score": 0.5651665829010474,
+    "best_cv_precision": 0.7903814244383934,
+    "best_cv_recall": 0.440942419836468,
+    "best_cv_roc_auc": 0.8739868966468141,
+    "best_params": {
+      "classifier__learning_rate": 0.1,
+      "classifier__max_depth": 3,
+      "classifier__n_estimators": 120
+    }
+  },
+  {
+    "model_name": "AdaBoost",
+    "best_cv_f1_score": 0.1447189054680482,
+    "best_cv_precision": 0.8841666666666667,
+    "best_cv_recall": 0.0791864046401826,
+    "best_cv_roc_auc": 0.7919231586467763,
+    "best_params": {
+      "classifier__learning_rate": 0.1,
+      "classifier__n_estimators": 100
+    }
+  }
+]

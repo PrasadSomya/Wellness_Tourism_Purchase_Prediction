@@ -1,0 +1,102 @@
+name: Tourism Project Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HF_USERNAME: somya1607
+  HF_DATASET_REPO_ID: somya1607/tourism-wellness-data
+  HF_MODEL_REPO_ID: somya1607/tourism-wellness-model
+  HF_FRONTEND_SPACE_REPO_ID: somya1607/visit-with-us-frontend
+  HF_BACKEND_SPACE_REPO_ID: somya1607/visit-with-us-backend
+  BACKEND_URL: https://somya1607-visit-with-us-backend.hf.space
+
+jobs:
+  register-dataset:
+    name: Register Dataset
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tourism_project/requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tourism_project/requirements.txt
+      - name: Register Dataset
+        run: python tourism_project/model_building/data_register.py
+
+  prepare-data:
+    name: Prepare Data
+    needs: register-dataset
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tourism_project/requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tourism_project/requirements.txt
+      - name: Prepare Data
+        run: python tourism_project/model_building/prep.py
+
+  train-register-model:
+    name: Train and Register Model
+    needs: prepare-data
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      MLFLOW_TRACKING_URI: http://127.0.0.1:5000
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tourism_project/requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tourism_project/requirements.txt
+      - name: Start MLflow Server
+        run: |
+          nohup mlflow server --host 127.0.0.1 --port 5000 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlartifacts > mlflow.log 2>&1 &
+          sleep 8
+      - name: Model Building
+        run: python tourism_project/model_building/train.py
+
+  deploy-hosting:
+    name: Deploy Hugging Face Spaces
+    needs: [register-dataset, prepare-data, train-register-model]
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tourism_project/requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tourism_project/requirements.txt
+      - name: Deploy Hugging Face Spaces
+        run: python tourism_project/deployment/hosting.py
