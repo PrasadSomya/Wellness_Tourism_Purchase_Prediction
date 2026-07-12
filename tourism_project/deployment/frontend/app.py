@@ -248,10 +248,10 @@ if submit_button:
     input_dataframe = pd.DataFrame([customer_data])
 
     with st.expander("Customer input supplied to the model"):
-        st.dataframe(
-            input_dataframe,
-            use_container_width=True,
-        )
+        # Keep the rubric-required DataFrame, but render it as JSON instead of
+        # st.dataframe. This avoids the Arrow serialization path that caused
+        # native exit code 139 in the previous Space runtime.
+        st.json(input_dataframe.iloc[0].to_dict())
 
     try:
         with st.spinner("Generating prediction..."):
