@@ -1,11 +1,12 @@
 import os
+import shutil
 import sys
 import time
 import traceback
 from pathlib import Path
 
 import requests
-from huggingface_hub import CommitOperationAdd, HfApi
+from huggingface_hub import CommitOperationAdd, HfApi, hf_hub_download
 
 HF_TOKEN = os.getenv("HF_TOKEN")
 HF_MODEL_REPO = os.getenv(
@@ -33,7 +34,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_FOLDER = PROJECT_DIR / "deployment" / "frontend"
 BACKEND_FOLDER = PROJECT_DIR / "deployment" / "backend"
 REQUIRED_FILES = ("app.py", "requirements.txt", "Dockerfile", "README.md")
-OPTIONAL_BACKEND_ARTIFACTS = (
+REQUIRED_BACKEND_ARTIFACTS = (
     "wellness_tourism_model.joblib",
     "model_metadata.json",
     "feature_schema.json",
@@ -124,6 +125,30 @@ def deploy_files_atomically(
         print(f"  - {name}")
 
 
+def ensure_backend_artifacts() -> None:
+    """Bundle registered model files so the live API never downloads per request."""
+    BACKEND_FOLDER.mkdir(parents=True, exist_ok=True)
+
+    for filename in REQUIRED_BACKEND_ARTIFACTS:
+        destination = BACKEND_FOLDER / filename
+        if destination.is_file() and destination.stat().st_size > 0:
+            print(f"Using bundled backend artifact: {filename}")
+            continue
+
+        print(f"Downloading registered model artifact: {filename}")
+        downloaded_path = hf_hub_download(
+            repo_id=HF_MODEL_REPO,
+            filename=filename,
+            token=HF_TOKEN,
+        )
+        shutil.copy2(downloaded_path, destination)
+
+        if not destination.is_file() or destination.stat().st_size == 0:
+            raise RuntimeError(f"Model artifact could not be prepared: {filename}")
+
+        print(f"Prepared backend artifact: {destination}")
+
+
 def request_restart(api: HfApi, repo_id: str) -> None:
     try:
         api.restart_space(repo_id=repo_id)
@@ -169,10 +194,9 @@ def main() -> None:
     authenticated_user = identity.get("name") or identity.get("fullname") or "authenticated user"
     print(f"Authenticated with Hugging Face as: {authenticated_user}")
 
-    backend_files = list(REQUIRED_FILES)
-    backend_files.extend(
-        name for name in OPTIONAL_BACKEND_ARTIFACTS if (BACKEND_FOLDER / name).is_file()
-    )
+    ensure_backend_artifacts()
+
+    backend_files = list(REQUIRED_FILES) + list(REQUIRED_BACKEND_ARTIFACTS)
 
     deploy_files_atomically(
         api=api,

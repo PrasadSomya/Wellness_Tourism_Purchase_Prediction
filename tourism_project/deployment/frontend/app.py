@@ -4,6 +4,8 @@ import os
 import pandas as pd
 import requests
 import streamlit as st
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 # ---------------------------------------------------------
@@ -23,6 +25,26 @@ BACKEND_URL = os.getenv(
     "BACKEND_URL",
     "https://somya1607-visit-with-us-backend.hf.space",
 ).rstrip("/")
+
+# Hugging Face free Spaces can briefly return 429/502/503/504 while a Space
+# is waking up, rebuilding, or receiving several requests. Retry only these
+# transient responses and respect Hugging Face's Retry-After header.
+retry_strategy = Retry(
+    total=4,
+    connect=3,
+    read=3,
+    status=4,
+    backoff_factor=2,
+    status_forcelist=(429, 502, 503, 504),
+    allowed_methods=frozenset({"GET", "POST"}),
+    respect_retry_after_header=True,
+    raise_on_status=False,
+)
+
+http_session = requests.Session()
+retry_adapter = HTTPAdapter(max_retries=retry_strategy)
+http_session.mount("https://", retry_adapter)
+http_session.mount("http://", retry_adapter)
 
 
 # ---------------------------------------------------------
@@ -50,7 +72,7 @@ with st.sidebar:
 
     if st.button("Check backend status"):
         try:
-            health_response = requests.get(
+            health_response = http_session.get(
                 f"{BACKEND_URL}/health",
                 timeout=30,
             )
@@ -256,11 +278,36 @@ if submit_button:
     try:
         with st.spinner("Generating prediction..."):
 
-            prediction_response = requests.post(
+            prediction_response = http_session.post(
                 f"{BACKEND_URL}/predict",
                 json=customer_data,
-                timeout=60,
+                timeout=(15, 90),
             )
+
+            if prediction_response.status_code == 429:
+                retry_after = prediction_response.headers.get(
+                    "Retry-After",
+                    "a few minutes",
+                )
+                st.error(
+                    "Hugging Face temporarily rate-limited the backend. "
+                    f"Retry after: {retry_after}."
+                )
+                st.stop()
+
+            if prediction_response.status_code == 503:
+                try:
+                    backend_error = prediction_response.json()
+                except ValueError:
+                    backend_error = prediction_response.text
+                st.error(
+                    "The backend is running, but the model is not ready. "
+                    "Run the GitHub Actions deployment again so the registered "
+                    "model artifacts are bundled with the backend Space."
+                )
+                with st.expander("Backend error details"):
+                    st.json(backend_error) if isinstance(backend_error, dict) else st.code(backend_error)
+                st.stop()
 
             prediction_response.raise_for_status()
             prediction_result = prediction_response.json()
@@ -310,7 +357,14 @@ if submit_button:
         )
 
     except requests.RequestException as exc:
-        st.error(f"Prediction request failed: {exc}")
+        response = getattr(exc, "response", None)
+        if response is not None:
+            st.error(
+                f"Prediction request failed with HTTP {response.status_code}: "
+                f"{response.text[:500]}"
+            )
+        else:
+            st.error(f"Prediction request failed: {exc}")
 
     except (TypeError, ValueError) as exc:
         st.error(f"Invalid prediction response: {exc}")
